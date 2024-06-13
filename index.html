@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selecionar Arquivo Excel</title>
+</head>
+<body>
+    <h2>Remover Duplicatas de Arquivo Excel</h2>
+    <input type="file" id="fileInput" accept=".xlsx, .xls">
+    <button onclick="processarArquivo()">Processar Arquivo</button>
+
+    <script>
+        function processarArquivo() {
+            var input = document.getElementById('fileInput');
+            var file = input.files[0];
+
+            if (file) {
+                var formData = new FormData();
+                formData.append('excel_file', file);
+
+                fetch('/processar', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(message => {
+                    alert(message);
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao processar o arquivo.');
+                });
+            } else {
+                alert('Selecione um arquivo Excel.');
+            }
+        }
+    </script>
+</body>
+</html>
