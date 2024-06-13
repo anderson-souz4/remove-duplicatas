@@ -4,16 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Selecionar Arquivo Excel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #fileInput {
+            margin-bottom: 10px;
+        }
+        #btnProcessar {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        #btnProcessar:hover {
+            background-color: #45a049;
+        }
+        #btnProcessar:disabled {
+            background-color: #aaaaaa;
+            cursor: not-allowed;
+        }
+        #message {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
 </head>
 <body>
     <h2>Remover Duplicatas de Arquivo Excel</h2>
     <input type="file" id="fileInput" accept=".xlsx, .xls">
-    <button onclick="processarArquivo()">Processar Arquivo</button>
+    <button id="btnProcessar" onclick="processarArquivo()" disabled>Processar Arquivo</button>
+    <div id="message"></div>
 
     <script>
         function processarArquivo() {
             var input = document.getElementById('fileInput');
             var file = input.files[0];
+            var messageDiv = document.getElementById('message');
 
             if (file) {
                 var formData = new FormData();
@@ -23,18 +58,32 @@
                     method: 'POST',
                     body: formData
                 })
-                .then(response => response.text())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao processar o arquivo.');
+                    }
+                    return response.text();
+                })
                 .then(message => {
-                    alert(message);
+                    messageDiv.textContent = message;
+                    messageDiv.className = 'success';
                 })
                 .catch(error => {
                     console.error('Erro:', error);
-                    alert('Erro ao processar o arquivo.');
+                    messageDiv.textContent = error.message || 'Erro ao processar o arquivo.';
+                    messageDiv.className = 'error';
                 });
             } else {
-                alert('Selecione um arquivo Excel.');
+                messageDiv.textContent = 'Selecione um arquivo Excel.';
+                messageDiv.className = 'error';
             }
         }
+
+        // Habilitar o botão se um arquivo for selecionado
+        document.getElementById('fileInput').addEventListener('change', function() {
+            var btnProcessar = document.getElementById('btnProcessar');
+            btnProcessar.disabled = !this.value; // Desabilita o botão se não houver arquivo selecionado
+        });
     </script>
 </body>
 </html>
